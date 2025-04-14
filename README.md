@@ -1,7 +1,7 @@
 # ejecutar proyecto
 
-npm i
-npm run dev
+- npm i
+- npm run dev
 
 # obs
 
