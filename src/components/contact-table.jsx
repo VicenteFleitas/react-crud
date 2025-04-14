@@ -59,37 +59,38 @@ export function ContactTable({ contacts, onEdit, onDelete, onAddEdit }) {
           );
         },
       },
+
       {
-        accessorKey: "email",
-        header: "Correo",
-        Cell: ({ row }) => {
-          const isEditing = editingRow?.id === row.original.id;
-          return isEditing ? (
-            <input
-              type="email"
-              className="w-full p-2 border rounded"
-              value={editedValues.email || row.original.email}
-              onChange={(e) => handleCellEdit("email", e.target.value)}
-            />
-          ) : (
-            row.original.email
-          );
-        },
-      },
-      {
-        accessorKey: "phone",
-        header: "Celular",
+        accessorKey: "createdAt",
+        header: "Creado",
         Cell: ({ row }) => {
           const isEditing = editingRow?.id === row.original.id;
           return isEditing ? (
             <input
               type="text"
               className="w-full p-2 border rounded"
-              value={editedValues.phone || row.original.phone}
-              onChange={(e) => handleCellEdit("phone", e.target.value)}
+              value={editedValues.createdAt || row.original.createdAt}
+              onChange={(e) => handleCellEdit("createdAt", e.target.value)}
             />
           ) : (
-            row.original.phone
+            row.original.createdAt.split("T")[0]
+          );
+        },
+      },
+      {
+        accessorKey: "updatedAt",
+        header: "Modificado",
+        Cell: ({ row }) => {
+          const isEditing = editingRow?.id === row.original.id;
+          return isEditing ? (
+            <input
+              type="text"
+              className="w-full p-2 border rounded"
+              value={editedValues.updatedAt || row.original.updatedAt}
+              onChange={(e) => handleCellEdit("updatedAt", e.target.value)}
+            />
+          ) : (
+            row.original.updatedAt.split("T")[0]
           );
         },
       },

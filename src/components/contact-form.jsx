@@ -1,23 +1,74 @@
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { TextField, Box, Typography } from "@mui/material";
+import {
+  TextField,
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
+
+import useFetch from "../hooks/useFetch";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Completar nombre"),
-  email: Yup.string().email("Correo invalido").required("Completar correo"),
-  phone:
-    Yup.string()
-    .required("Completar contacto"),
+  studio: Yup.number().required("Seleccionar studio"),
+  producer: Yup.number().required("Seleccionar producer"),
 });
 
 export function ContactForm({ onSubmit, initialValues, hideButtons = false }) {
+  const { fetchData, loading, response, error } = useFetch();
+  const studios = useFetch();
+  const movieById = useFetch();
+
+  useEffect(() => {
+    // get producers list
+    fetchData({
+      url: "/v1/producers/list",
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem("access_token")}`,
+      },
+    });
+    // get studios list
+    studios.fetchData({
+      url: "/v1/studios/list",
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem("access_token")}`,
+      },
+    });
+    // get movie by id
+    if (initialValues) {
+      movieById.fetchData({
+        url: `/v1/movies/${initialValues.id}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${window.localStorage.getItem(
+            "access_token"
+          )}`,
+        },
+      });
+    }
+  }, []);
+
   const formik = useFormik({
-    initialValues: initialValues || {
-      id: "",
-      name: "",
-      email: "",
-      phone: "",
-    },
+    enableReinitialize: true,
+    initialValues: movieById?.response
+      ? {
+          id: movieById.response.id,
+          name: movieById.response.name,
+          studio: movieById.response.studios[0].id,
+          producer: movieById.response.producers[0].id,
+        }
+      : {
+          id: "",
+          name: "",
+          studio: "",
+          producer: "",
+        },
     validationSchema,
     onSubmit: (values) => {
       onSubmit(values);
@@ -46,11 +97,67 @@ export function ContactForm({ onSubmit, initialValues, hideButtons = false }) {
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr 1fr" },
+          gridTemplateColumns: { xs: "1fr", sm: "1fr" },
           gap: 2,
           mb: 2,
         }}
       >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 2,
+          }}
+        >
+          {loading && <CircularProgress />}
+          {!loading && !error && (
+            <Box sx={{ width: "100%" }}>
+              <Typography>Producers</Typography>
+              <Select
+                labelId="producers-select-label"
+                id="producers-simple-select"
+                // value={producer}
+                // onChange={handleChangeProducer}
+                label="Producers"
+                value={formik.values.producer}
+                onChange={formik.handleChange("producer")}
+                sx={{ width: "100%" }}
+              >
+                {response?.map((producer) => (
+                  <MenuItem key={`producer${producer.id}`} value={producer.id}>
+                    {producer.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+          )}
+
+          {studios.loading && <CircularProgress />}
+          {!studios.loading && !studios.error && (
+            <Box sx={{ width: "100%" }}>
+              <Typography>Studios</Typography>
+              <Select
+                labelId="studios-select-label"
+                id="studios-simple-select"
+                // value={studio}
+                // onChange={handleChangeStudio}
+                label="Studios"
+                value={formik.values.studio}
+                onChange={formik.handleChange("studio")}
+                sx={{ width: "100%" }}
+              >
+                {studios.response?.map((studioItem) => (
+                  <MenuItem
+                    key={`studio${studioItem.id}`}
+                    value={studioItem.id}
+                  >
+                    {studioItem.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+          )}
+        </Box>
         <TextField
           fullWidth
           id="name"
@@ -61,30 +168,6 @@ export function ContactForm({ onSubmit, initialValues, hideButtons = false }) {
           onBlur={formik.handleBlur}
           error={formik.touched.name && Boolean(formik.errors.name)}
           helperText={formik.touched.name && formik.errors.name}
-        />
-
-        <TextField
-          fullWidth
-          id="email"
-          name="email"
-          label="Email"
-          value={formik.values.email}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.email && Boolean(formik.errors.email)}
-          helperText={formik.touched.email && formik.errors.email}
-        />
-
-        <TextField
-          fullWidth
-          id="phone"
-          name="phone"
-          label="Phone"
-          value={formik.values.phone}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.phone && Boolean(formik.errors.phone)}
-          helperText={formik.touched.phone && formik.errors.phone}
         />
       </Box>
     </Box>

@@ -10,7 +10,7 @@ const useAxios = () => {
   const [loading, setLoading] = useState(false);
 
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000",
+    baseURL: "https://cloud.romapy.com",
   });
 
   // axiosInstance.interceptors.request.use(
@@ -31,7 +31,13 @@ const useAxios = () => {
     return () => controller?.abort();
   }, []);
 
-  const fetchData = async ({ url, method, data = {}, params = {} }) => {
+  const fetchData = async ({
+    url,
+    method,
+    data = {},
+    params = {},
+    headers = {},
+  }) => {
     setLoading(true);
 
     controller.abort();
@@ -44,6 +50,7 @@ const useAxios = () => {
         data,
         params,
         signal: controller.signal,
+        // headers,
       });
       setResponse(result.data);
       setStatusCode(result.status);

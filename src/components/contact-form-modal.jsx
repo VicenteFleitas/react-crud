@@ -13,9 +13,9 @@ export function ContactFormModal({ open, onClose, onSubmit, initialValues }) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+    <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>
-        {initialValues ? "Edit Contact" : "Add New Contact"}
+        {initialValues ? "Editar Movie" : "Agregar Movie"}
       </DialogTitle>
       <DialogContent>
         <ContactForm
@@ -25,14 +25,14 @@ export function ContactFormModal({ open, onClose, onSubmit, initialValues }) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button
           variant="contained"
           color="primary"
           form="contact-form"
           type="submit"
         >
-          {initialValues ? "Update" : "Add"} Contact
+          {initialValues ? "Actualizar" : "Agregar"} Movie
         </Button>
       </DialogActions>
     </Dialog>
